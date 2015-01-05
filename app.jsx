@@ -122,6 +122,10 @@ var Joke = React.createClass({
         console.log(`Unable to process imgur link: ${href}`)
         continue
       }
+      if (imgMatch[1] == 'a') {
+        console.log(`Ignoring imgur album link: ${href}`)
+        continue
+      }
       var src = `http://i.imgur.com/${imgMatch[1]}`
       if (!/\.[a-z]{3,4}$/i.test(src)) {
         src += '.png'
