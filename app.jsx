@@ -121,7 +121,10 @@ var Joke = React.createClass({
       }
       var img = document.createElement('img')
       img.src = src
-      a.parentNode.replaceChild(img, a)
+      while (a.firstChild) {
+        a.removeChild(a.firstChild)
+      }
+      a.appendChild(img)
     }
   },
 
