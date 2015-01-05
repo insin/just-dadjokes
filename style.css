@@ -43,6 +43,9 @@ h1 {
 .Joke .md {
   text-align: justify;
 }
+.Joke .md img {
+  display: block;
+}
 
 @media screen and (max-width: 45em) {
   .Joke__score {

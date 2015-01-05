@@ -115,7 +115,14 @@ var Joke = React.createClass({
     if (imgurLinks.length === 0) { return }
     for (var i = 0, l = imgurLinks.length; i < l ; i++) {
       var a = imgurLinks[i]
-      var src = a.href
+      var {href, textContent} = a
+
+      var imgMatch = /imgur\.com\/(?:gallery\/)?([^\/]+)/.exec(href)
+      if (imgMatch == null) {
+        console.log(`Unable to process imgur link: ${href}`)
+        continue
+      }
+      var src = `http://i.imgur.com/${imgMatch[1]}`
       if (!/\.[a-z]{3,4}$/i.test(src)) {
         src += '.png'
       }
@@ -125,6 +132,10 @@ var Joke = React.createClass({
         a.removeChild(a.firstChild)
       }
       a.appendChild(img)
+
+      if (textContent != href) {
+        a.parentNode.insertBefore(document.createTextNode(`(${textContent})`), a.nextSibling)
+      }
     }
   },
 
