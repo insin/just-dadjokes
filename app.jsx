@@ -107,6 +107,9 @@ var DadJokes = React.createClass({
 })
 
 var Joke = React.createClass({
+  /**
+   * Find links to imgur and inline them as images.
+   */
   componentDidMount() {
     var imgurLinks = document.querySelectorAll(`#joke-${this.props.id} a[href*="//i.imgur.com"]`)
     if (imgurLinks.length > 0) {
@@ -124,6 +127,7 @@ var Joke = React.createClass({
   },
 
   render() {
+    if (!this.props.html) { return null } // No punchliney? No showy!
     return <div className="Joke">
       <div className="Joke__link"><a href={this.props.url}>{this.props.title}</a></div>
       <p className="Joke__waitforit">&hellip;</p>
