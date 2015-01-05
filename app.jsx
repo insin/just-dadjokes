@@ -111,14 +111,17 @@ var Joke = React.createClass({
    * Find links to imgur and inline them as images.
    */
   componentDidMount() {
-    var imgurLinks = document.querySelectorAll(`#joke-${this.props.id} a[href*="//i.imgur.com"]`)
-    if (imgurLinks.length > 0) {
-      for (var i = 0, l = imgurLinks.length; i < l ; i++) {
-        var a =imgurLinks[i]
-        var img = document.createElement('img')
-        img.src = a.href
-        a.parentNode.replaceChild(img, a)
+    var imgurLinks = document.querySelectorAll(`#joke-${this.props.id} a[href*="imgur.com"]`)
+    if (imgurLinks.length === 0) { return }
+    for (var i = 0, l = imgurLinks.length; i < l ; i++) {
+      var a = imgurLinks[i]
+      var src = a.href
+      if (!/\.[a-z]{3,4}$/i.test(src)) {
+        src += '.png'
       }
+      var img = document.createElement('img')
+      img.src = src
+      a.parentNode.replaceChild(img, a)
     }
   },
 
