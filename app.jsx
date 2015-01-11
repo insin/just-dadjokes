@@ -14,14 +14,13 @@ function fullname(joke) {
   return `t3_${joke.id}`
 }
 
-function saveSettings(state) {
-  var {minScore} = state
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify({minScore}))
+function saveSettings(settings) {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
 }
 
 function loadSettings() {
   var json = localStorage.getItem(SETTINGS_KEY)
-  return json ? JSON.parse(json) : {}
+  return json ? JSON.parse(json) : {minScore: 0, inlineMedia: true}
 }
 
 var DadJokes = React.createClass({
@@ -33,13 +32,12 @@ var DadJokes = React.createClass({
   },
 
   getInitialState() {
-    var settings = loadSettings()
     return {
       after: null
     , before: null
     , count: 0
     , jokes: []
-    , minScore: settings.minScore || 0
+    , settings: loadSettings()
     , loading: false
     , page: this.props.page || ''
     , showSettings: false
@@ -102,13 +100,28 @@ var DadJokes = React.createClass({
     this.setState({showSettings})
   },
 
-  minScoreChanged(e) {
-    var minScore = Number(e.target.value)
-    if (isNaN(minScore)) { return }
-    this.setState({minScore}, () => saveSettings(this.state))
+  settingChanged(e) {
+    var value
+    switch(e.target.type) {
+      case 'number':
+        value = Number(e.target.value)
+        if (isNaN(value)) { return }
+        break
+      case 'checkbox':
+        value = e.target.checked
+        break
+      default:
+        value = e.target.value
+    }
+
+    var settings = this.state.settings
+    settings[e.target.id] = value
+    saveSettings(settings)
+    this.setState({settings})
   },
 
   render() {
+    var {settings} = this.state
     return <div className="DadJokes">
       <header>
         <h1>
@@ -116,15 +129,20 @@ var DadJokes = React.createClass({
           <img src="cog.png" tabIndex="0" alt="Settings" className="control" onClick={this.toggleSettings}/>
         </h1>
         <ReactCSSTransitionGroup transitionName="settings" component="div" className="settings-wrap">
-          {this.state.showSettings && <div className="DadJokes__settings" key="settings">
-            <label htmlFor="minScore">Minimum score:</label>{' '}
-            <input type="number" value={this.state.minScore} id="minScore" min="0" onChange={this.minScoreChanged}/>
+          {this.state.showSettings && <div className="DadJokes__settings" key="settings" onChange={this.settingChanged}>
+            <div className="Setting">
+              <label htmlFor="minScore">Minimum score:</label>{' '}
+              <input type="number" value={settings.minScore} id="minScore" min="0"/>
+            </div>
+            <div className="Setting">
+              <label><input type="checkbox" checked={settings.inlineMedia} id="inlineMedia"/> Inline media links</label>
+            </div>
           </div>}
         </ReactCSSTransitionGroup>
       </header>
       {this.state.loading && <p>Gathering puns&hellip;</p>}
-      {this.state.jokes.filter(joke => joke.score >= this.state.minScore)
-                       .map(joke => <Joke key={joke.id} {...joke}/>)}
+      {this.state.jokes.filter(joke => joke.score >= settings.minScore)
+                       .map(joke => <Joke key={`${joke.id}-${settings.inlineMedia}`} inlineMedia={settings.inlineMedia} {...joke}/>)}
       {!this.state.loading && <h1>
         {this.state.before && <a href={`#before=${this.state.before}&count=${this.state.count + 1}`}>
           &lt; Prev
@@ -151,8 +169,11 @@ var Joke = React.createClass({
    * Find links to imgur and inline them as images.
    */
   componentDidMount() {
+    if (!this.props.inlineMedia) { return }
+
     var imgurLinks = document.querySelectorAll(`#joke-${this.props.id} a[href*="imgur.com"]`)
     if (imgurLinks.length === 0) { return }
+
     for (var i = 0, l = imgurLinks.length; i < l ; i++) {
       var a = imgurLinks[i]
       var {href, textContent} = a

@@ -58,6 +58,14 @@ img {
   opacity: 0.01;
 }
 
+.Setting {
+  margin-bottom: .6em;
+}
+
+.Setting:last-child {
+  margin-bottom: 0;
+}
+
 .control {
   cursor: pointer;
 }
