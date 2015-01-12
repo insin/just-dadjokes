@@ -20,7 +20,11 @@ function saveSettings(settings) {
 
 function loadSettings() {
   var json = localStorage.getItem(SETTINGS_KEY)
-  return json ? JSON.parse(json) : {minScore: 0, inlineMedia: true}
+  var settings = json ? JSON.parse(json) : {minScore: 0, inlineMedia: true}
+  // Patch defaults for new settings
+  if (typeof settings.inlineMedia == 'undefined') {
+    settings.inlineMedia = true
+  }
 }
 
 var DadJokes = React.createClass({
