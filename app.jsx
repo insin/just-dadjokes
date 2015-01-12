@@ -195,6 +195,19 @@ var Joke = React.createClass({
       var link = links[i]
       var href = link.href.replace(/^file:\/\//, '')
 
+      // Convert spoiler links to display spoilers inline on hover/focus
+      if (href == '/s') {
+        link.parentNode.replaceChild(el('div', {className: 'Spoiler', tabIndex: 0},
+          el('span', {className: 'Spoiler__hint'}, link.textContent), ' ',
+          el('span', {className: 'Spoiler__spoiler'}, link.title)
+        ), link)
+        continue
+      }
+      // Convert root relative links to absolute links to Reddit
+      else if (href.charAt(0) == '/') {
+        link.href = href = `https://www.reddit.com${href}`
+      }
+
       if (!this.props.inlineMedia) { return }
 
       // Get the image href from imgur links

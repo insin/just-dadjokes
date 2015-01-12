@@ -116,3 +116,18 @@ img {
     padding-right: 0 !important;
   }
 }
+
+.Spoiler {
+  background-color: #222;
+  padding: 4px;
+}
+.Spoiler__hint {
+  color: #00d8ff;
+}
+.Spoiler__spoiler {
+  color: #222;
+}
+.Spoiler:hover .Spoiler__spoiler,
+.Spoiler:focus .Spoiler__spoiler {
+  color: #fff;
+}
