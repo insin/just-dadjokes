@@ -135,7 +135,7 @@ var DadJokes = React.createClass({
               <input type="number" value={settings.minScore} id="minScore" min="0"/>
             </div>
             <div className="Setting">
-              <label><input type="checkbox" checked={settings.inlineMedia} id="inlineMedia"/> Inline media links</label>
+              <label><input type="checkbox" checked={settings.inlineMedia} id="inlineMedia"/> Display media inline</label>
             </div>
           </div>}
         </ReactCSSTransitionGroup>
