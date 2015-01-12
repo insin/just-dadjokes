@@ -220,6 +220,20 @@ var Joke = React.createClass({
           href += '.png'
         }
       }
+
+      if (/youtube.com|youtu.be/.test(href)) {
+        var ytMatch = /https?:\/\/(?:www\.)youtu(?:be\.com|\.be)\/(?:watch\?v=)(.+)/.exec(href)
+        if (ytMatch == null) { continue }
+        link.parentNode.replaceChild(el('div', {className: 'Video'},
+          el('iframe', {
+            width: 480
+          , height: 360
+          , src: `https://www.youtube.com/embed/${ytMatch[1]}`
+          , frameBorder: 0
+          , allowfullscreen: true
+          })
+        ), link)
+        continue
       }
 
       if (/\.(?:png|gif|jpe?g)$/i.test(href)) {
