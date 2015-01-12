@@ -120,6 +120,7 @@ img {
 .Spoiler {
   background-color: #222;
   padding: 4px;
+  cursor: help;
 }
 .Spoiler__hint {
   color: #00d8ff;
