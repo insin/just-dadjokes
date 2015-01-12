@@ -25,6 +25,7 @@ function loadSettings() {
   if (typeof settings.inlineMedia == 'undefined') {
     settings.inlineMedia = true
   }
+  return settings
 }
 
 var DadJokes = React.createClass({
