@@ -164,42 +164,63 @@ var DadJokes = React.createClass({
   }
 })
 
+var hasOwn = Object.prototype.hasOwnProperty
+
+function el(tagName, attrs, ...children) {
+  var element = document.createElement(tagName)
+  if (attrs) {
+    for (var attr in attrs) {
+      if (hasOwn.call(attrs, attr)) {
+        element[attr] = attrs[attr]
+      }
+    }
+  }
+  for (var i = 0, l = children.length; i < l ; i++) {
+    var child = children[i]
+    if (typeof child == 'string') {
+      child = document.createTextNode(child)
+    }
+    if (child != null && child !== false) {
+      element.appendChild(child)
+    }
+  }
+  return element
+}
+
 var Joke = React.createClass({
-  /**
-   * Find links to imgur and inline them as images.
-   */
   componentDidMount() {
-    if (!this.props.inlineMedia) { return }
+    var links = document.querySelectorAll(`#joke-${this.props.id} a`)
 
-    var imgurLinks = document.querySelectorAll(`#joke-${this.props.id} a[href*="imgur.com"]`)
-    if (imgurLinks.length === 0) { return }
+    for (var i = 0, l = links.length; i < l ; i++) {
+      var link = links[i]
+      var href = link.href.replace(/^file:\/\//, '')
 
-    for (var i = 0, l = imgurLinks.length; i < l ; i++) {
-      var a = imgurLinks[i]
-      var {href, textContent} = a
+      if (!this.props.inlineMedia) { return }
 
-      var imgMatch = /imgur\.com\/(?:gallery\/)?([^\/]+)/.exec(href)
-      if (imgMatch == null) {
-        console.log(`Unable to process imgur link: ${href}`)
-        continue
+      // Get the image href from imgur links
+      if (/imgur.com/.test(href)) {
+        var imgMatch = /imgur\.com\/(?:gallery\/)?([^\/]+)/.exec(href)
+        // No match, or it was a gallery URL
+        if (imgMatch == null || imgMatch[1] == 'a') { continue }
+        href = `http://i.imgur.com/${imgMatch[1]}`
+        if (!/\.[a-z]{3,4}$/i.test(href)) {
+          href += '.png'
+        }
       }
-      if (imgMatch[1] == 'a') {
-        console.log(`Ignoring imgur album link: ${href}`)
-        continue
       }
-      var src = `http://i.imgur.com/${imgMatch[1]}`
-      if (!/\.[a-z]{3,4}$/i.test(src)) {
-        src += '.png'
-      }
-      var img = document.createElement('img')
-      img.src = src
-      while (a.firstChild) {
-        a.removeChild(a.firstChild)
-      }
-      a.appendChild(img)
 
-      if (textContent != href) {
-        a.parentNode.insertBefore(document.createTextNode(`(${textContent})`), a.nextSibling)
+      if (/\.(?:png|gif|jpe?g)$/i.test(href)) {
+        var {textContent} = link
+        var img = el('img', {src: href})
+        while (link.firstChild) {
+          link.removeChild(link.firstChild)
+        }
+        link.appendChild(img)
+        // If the link text wasn't a repeat of the href, display it after the
+        // inlined image.
+        if (textContent != link.href) {
+          link.parentNode.insertBefore(document.createTextNode(`(${textContent})`), link.nextSibling)
+        }
       }
     }
   },
