@@ -137,7 +137,7 @@ var DadJokes = React.createClass({
       <header>
         <h1>
           <a href="https://www.reddit.com/r/dadjokes/" onClick={this.home}>Just /r/dadjokes</a>{' '}
-          <img src="cog.png" tabIndex="0" alt="Settings" className="control" onClick={this.toggleSettings}/>
+          <img src="cog.png" tabIndex="0" alt="Settings" className="control" onClick={this.toggleSettings} onKeyPress={this.toggleSettings}/>
         </h1>
         <ReactCSSTransitionGroup transitionName="settings" component="div" className="settings-wrap">
           {this.state.showSettings && <div className="DadJokes__settings" key="settings" onChange={this.settingChanged}>
