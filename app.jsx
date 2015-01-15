@@ -3,6 +3,7 @@ void function() { 'use strict';
 var _div = document.createElement('div')
 var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
 
+var HASH_MATCH_RE = /^#?((after|before)=t3_[0-9a-z]{6}&count=(\d+))?$/i
 var SETTINGS_KEY = 'jdj:settings'
 
 function last(items) {
@@ -88,7 +89,7 @@ var DadJokes = React.createClass({
   },
 
   onHashChange(e) {
-    var match = /^#?((after|before)=t3_[0-9a-z]{6}&count=(\d+))?$/.exec(window.location.hash)
+    var match = HASH_MATCH_RE.exec(window.location.hash)
     if (!match) { return }
     var page = ''
     var count = 0
@@ -251,8 +252,8 @@ var Joke = React.createClass({
   }
 })
 
-var pageMatch = /^#((?:after|before)=t3_[0-9a-z]{6}&count=\d+)$/.exec(window.location.hash)
-var page = (pageMatch != null ? pageMatch[1] : '')
+var pageMatch = HASH_MATCH_RE.exec(window.location.hash)
+var page = (pageMatch != null && pageMatch[1] ? pageMatch[1] : '')
 React.render(<DadJokes page={page}/>, document.getElementById('app'))
 
 }()
