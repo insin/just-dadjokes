@@ -11,8 +11,9 @@ draw.
 ## Features
 
 * Configurable minimum score threshold (default: `0`)
-* Linked media can be inlined (defaults to on):
+* Linked media can be inlined or embedded as appropriate (defaults to on):
   * Imgur links
+  * Imgur galleries
   * YouTube videos
   * Any link ending in .gif/.jpg/.png
 * The Reddit `/s` convention for spoiler links is converted to display spoilers

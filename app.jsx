@@ -30,6 +30,15 @@ function el(tagName, attrs, ...children) {
   return element
 }
 
+function embedLinkedMedia(link, attrs) {
+  if (link.textContent != link.href) {
+    link.parentNode.insertBefore(document.createTextNode(`(${link.textContent})`), link.nextSibling)
+  }
+  link.parentNode.replaceChild(el('div', {className: 'EmbeddedMedia'},
+    el('iframe', attrs)
+  ), link)
+}
+
 function saveSettings(settings) {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
 }
@@ -186,39 +195,46 @@ var Joke = React.createClass({
         ), link)
         continue
       }
+
       // Convert root relative links to absolute links to Reddit
-      else if (href.charAt(0) == '/') {
+      if (href.charAt(0) == '/') {
         link.href = href = `https://www.reddit.com${href}`
       }
 
       if (!this.props.inlineMedia) { return }
 
-      // Get the image href from imgur links
-      if (/imgur.com/.test(href)) {
-        var imgMatch = /imgur\.com\/(?:gallery\/)?([^\/]+)/.exec(href)
-        // No match, or it was a gallery URL
-        if (imgMatch == null || imgMatch[1] == 'a') { continue }
-        href = `http://i.imgur.com/${imgMatch[1]}`
+      // Embed YouTube videos
+      var ytMatch = /(?:https?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(?:watch\?v=)([^%]+)/.exec(href)
+      if (ytMatch != null) {
+        embedLinkedMedia(link, {
+          width: 480
+        , height: 360
+        , src: `https://www.youtube.com/embed/${ytMatch[1]}`
+        , frameBorder: 0
+        , allowfullscreen: true
+        })
+        continue
+      }
+
+      // Convert imgur links to image links, or embed galleries
+      var imgurMatch = /(?:https?:\/\/)?(?:(?:www|i)\.)?imgur\.com\/(?:(gallery|a)\/)?([^\/]+)/.exec(href)
+      if (imgurMatch != null) {
+        if (imgurMatch[1] == 'a') {
+          embedLinkedMedia(link, {
+            width: '100%'
+          , height: 500
+          , src: `https://imgur.com/a/${imgurMatch[2]}/embed`
+          , frameBorder: 0
+          })
+          continue
+        }
+        href = `http://i.imgur.com/${imgurMatch[2]}`
         if (!/\.[a-z]{3,4}$/i.test(href)) {
           href += '.png'
         }
       }
 
-      if (/youtube.com|youtu.be/.test(href)) {
-        var ytMatch = /https?:\/\/(?:www\.)youtu(?:be\.com|\.be)\/(?:watch\?v=)(.+)/.exec(href)
-        if (ytMatch == null) { continue }
-        link.parentNode.replaceChild(el('div', {className: 'Video'},
-          el('iframe', {
-            width: 480
-          , height: 360
-          , src: `https://www.youtube.com/embed/${ytMatch[1]}`
-          , frameBorder: 0
-          , allowfullscreen: true
-          })
-        ), link)
-        continue
-      }
-
+      // Inline image links
       if (/\.(?:png|gif|jpe?g)$/i.test(href)) {
         var {textContent} = link
         var img = el('img', {src: href})
@@ -226,8 +242,6 @@ var Joke = React.createClass({
           link.removeChild(link.firstChild)
         }
         link.appendChild(img)
-        // If the link text wasn't a repeat of the href, display it after the
-        // inlined image.
         if (textContent != link.href) {
           link.parentNode.insertBefore(document.createTextNode(`(${textContent})`), link.nextSibling)
         }
