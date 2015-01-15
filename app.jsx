@@ -258,19 +258,10 @@ var Joke = React.createClass({
     return false
   },
 
-  titlePadding() {
-    var score = this.props.score
-    if (score < 10) { return 3 }
-    if (score < 100) { return 4 }
-    if (score < 1000) { return 5 }
-    if (score < 10000) { return 6 }
-    return 7
-  },
-
   render() {
     if (!this.props.html) { return null } // No punchliney? No showy!
     return <div className="Joke">
-      <div className="Joke__link" style={{paddingRight: `${this.titlePadding()}em`}}>
+      <div className="Joke__link" style={{paddingRight: `${String(this.props.score).length + 2}em`}}>
         <a href={this.props.url}>{this.props.title}</a>{' '}
         <small className="Joke__score">{this.props.score}</small>
       </div>
