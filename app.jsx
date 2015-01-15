@@ -1,12 +1,9 @@
 void function() { 'use strict';
 
+var _div = document.createElement('div')
 var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
 
-var hasOwn = Object.prototype.hasOwnProperty
-
 var SETTINGS_KEY = 'jdj:settings'
-
-var _div = document.createElement('div')
 
 function last(items) {
   return items[items.length - 1]
@@ -19,21 +16,16 @@ function fullname(joke) {
 function el(tagName, attrs, ...children) {
   var element = document.createElement(tagName)
   if (attrs) {
-    for (var attr in attrs) {
-      if (hasOwn.call(attrs, attr)) {
-        element[attr] = attrs[attr]
-      }
-    }
+    Object.keys(attrs).forEach(attr => element[attr] = attrs[attr])
   }
-  for (var i = 0, l = children.length; i < l ; i++) {
-    var child = children[i]
+  children.forEach(child => {
     if (typeof child == 'string') {
       child = document.createTextNode(child)
     }
     if (child != null && child !== false) {
       element.appendChild(child)
     }
-  }
+  })
   return element
 }
 
@@ -43,12 +35,7 @@ function saveSettings(settings) {
 
 function loadSettings() {
   var json = localStorage.getItem(SETTINGS_KEY)
-  var settings = json ? JSON.parse(json) : {minScore: 0, inlineMedia: true}
-  // Patch defaults for new settings
-  if (typeof settings.inlineMedia == 'undefined') {
-    settings.inlineMedia = true
-  }
-  return settings
+  return json ? JSON.parse(json) : {minScore: 0, inlineMedia: true}
 }
 
 var DadJokes = React.createClass({
@@ -130,18 +117,13 @@ var DadJokes = React.createClass({
 
   settingChanged(e) {
     var value
-    switch(e.target.type) {
-      case 'number':
-        value = Number(e.target.value)
-        if (isNaN(value)) { return }
-        break
-      case 'checkbox':
-        value = e.target.checked
-        break
-      default:
-        value = e.target.value
+    if (e.target.type == 'number') {
+      value = Number(e.target.value)
+      if (isNaN(value)) { return }
     }
-
+    else if (e.target.type == 'checkbox') {
+      value = e.target.checked
+    }
     var settings = this.state.settings
     settings[e.target.id] = value
     saveSettings(settings)
@@ -181,9 +163,7 @@ var DadJokes = React.createClass({
         </a>}
       </h1>}
       <footer>
-        <a href="https://github.com/insin/just-dadjokes">
-          Source on GitHub
-        </a>
+        <a href="https://github.com/insin/just-dadjokes">Source on GitHub</a>
       </footer>
     </div>
   }
