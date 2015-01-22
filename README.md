@@ -14,6 +14,7 @@ draw.
 * Linked media can be inlined or embedded as appropriate (defaults to on):
   * Imgur links
   * Imgur galleries
+  * Imgur GIFV videos
   * YouTube videos
   * Any link ending in .gif/.jpg/.png
 * The Reddit `/s` convention for spoiler links is converted to display spoilers
